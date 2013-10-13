@@ -5,6 +5,7 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.ColumnBase
 import java.sql.Date
 import java.lang
+import scala.slick.jdbc.meta.MTable
 
 
 class SlickRepository extends Repository {
@@ -22,9 +23,14 @@ class SlickRepository extends Repository {
     def forInsert = (threadId.? ~ title ~ author ~ image ~ text ~ date) <> ({t => Post(None,t._1,t._2,t._3,t._4,t._5,t._6)},
       {(p : Post) => Some((p.threadId,p.title,p.author,p.image,p.text,p.date)) })
   }
-  val db = Database.forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
+  val db = Database.forURL( "jdbc:sqlserver://localhost;databaseName=cust;instanceName=SQLEXPRESS;", driver = "org.h2.Driver")
+  db.withSession { implicit session : Session =>
+    if(!MTable.getTables.list.exists(_.name.name == Posts.tableName))  {
+      Posts.ddl.create(session)
+      println("Posts created")
+    }
 
-
+  }
   private def getThreadFromPostsAndId(id : Int, posts : Seq[Post] ) = {
     if(posts.isEmpty)
       None
@@ -48,7 +54,7 @@ class SlickRepository extends Repository {
   def getThreads(from: Int, count: Int): Seq[Thread] = {
     db.withSession { implicit session =>
       (for(
-        threadId <- Posts.groupBy(_.threadId).sortBy(_._2.map(_.date).max).map(_._1).drop(from).take(count);
+        threadId <- Posts.groupBy(_.threadId).map(x => (x._1,x._2.map(_.date).max)).sortBy(_._2).map(_._1).drop(from).take(count);
         post <- Posts.sortBy(_.date).filter(_.threadId === threadId)
       ) yield post).list.groupBy(_.threadId).map { p =>
         p._1.map(Thread.apply(_,p._2))
