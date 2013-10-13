@@ -19,7 +19,7 @@ import org.json4s
 import scala.concurrent.ExecutionContext
 
 
-class ScalabaActor(dbActor : ActorRef, implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
+class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
 
   def actorRefFactory = context
 
