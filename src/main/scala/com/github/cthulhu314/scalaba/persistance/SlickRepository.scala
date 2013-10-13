@@ -22,7 +22,8 @@ class SlickRepository extends Repository {
     def forInsert = (threadId.? ~ title ~ author ~ image ~ text ~ date) <> ({t => Post(None,t._1,t._2,t._3,t._4,t._5,t._6)},
       {(p : Post) => Some((p.threadId,p.title,p.author,p.image,p.text,p.date)) })
   }
-  implicit val session = Database.threadLocalSession
+  val db = Database.forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
+
 
   private def getThreadFromPostsAndId(id : Int, posts : Seq[Post] ) = {
     if(posts.isEmpty)
@@ -32,48 +33,63 @@ class SlickRepository extends Repository {
   }
 
   def getPost(id: Int): Option[Post] = {
-    Posts.filter(_.id === id).map(_.*).list.headOption
+    db.withSession { implicit session =>
+      Posts.filter(_.id === id).map(_.*).list.headOption
+    }
   }
 
   def getThread(id: Int): Option[Thread] = {
-    getThreadFromPostsAndId(id,Posts.filter(_.threadId === id).sortBy(_.date).map(_.*).list)
+    db.withSession { implicit session =>
+      getThreadFromPostsAndId(id,Posts.filter(_.threadId === id).sortBy(_.date).map(_.*).list)
+    }
 
   }
 
   def getThreads(from: Int, count: Int): Seq[Thread] = {
-    val threadIds = Posts.groupBy(_.threadId).sortBy(_._2.map(_.date).max).map(_._1)
-    (for(
-      threadId <- threadIds;
-      post <- Posts.sortBy(_.date).filter(_.threadId === threadId)
-    ) yield post).list.groupBy(_.threadId).map { p =>
-      p._1.map(Thread.apply(_,p._2))
-    }.filter(_.isDefined).map(_.get).toSeq
+    db.withSession { implicit session =>
+      (for(
+        threadId <- Posts.groupBy(_.threadId).sortBy(_._2.map(_.date).max).map(_._1).drop(from).take(count);
+        post <- Posts.sortBy(_.date).filter(_.threadId === threadId)
+      ) yield post).list.groupBy(_.threadId).map { p =>
+        p._1.map(Thread.apply(_,p._2))
+      }.filter(_.isDefined).map(_.get).toSeq
+    }
   }
 
   def create(thread: Thread) : Option[Thread] = {
-    thread.posts.headOption.map { post =>
-      val postId = Posts.forInsert returning Posts.id insert post
-      Posts.filter(_.id === postId).map(_.threadId).update(postId)
-      Thread(postId,Seq(post.copy(id=Some(postId),threadId=Some(postId))))
+    db.withTransaction { implicit session =>
+      thread.posts.headOption.map { post =>
+        val postId = Posts.forInsert returning Posts.id insert post
+        Posts.filter(_.id === postId).map(_.threadId).update(postId)
+        Thread(postId,Seq(post.copy(id=Some(postId),threadId=Some(postId))))
+      }
     }
   }
 
   def create(post: Post) : Option[Post] =  {
-    post.threadId.flatMap {id =>
-      if(Posts.filter(_.threadId === id).map(_.*).exists.run)
-      {
-        val postId = Posts.forInsert returning Posts.id insert post
-        Some(post.copy(id = Some(postId)))
-      } else None
+    db.withTransaction { implicit session =>
+      post.threadId.flatMap {id =>
+        if(Posts.filter(_.threadId === id).map(_.*).exists.run)
+        {
+          val postId = Posts.forInsert returning Posts.id insert post
+          Some(post.copy(id = Some(postId)))
+        } else None
+      }
+
     }
-
   }
 
-  def delete(thread: Thread) = {
-    Posts.filter(_.threadId === thread.id).delete
+  def delete(thread: Thread) : Unit = {
+    db.withTransaction { implicit session : Session =>
+      Posts.filter(_.threadId === thread.id).delete
+    }
   }
 
-  def delete(post: Post) = {
-    Posts.filter(_.id === post.id).delete
+  def delete(post: Post) : Unit = {
+    db.withTransaction { implicit session : Session =>
+      Posts.filter(_.id === post.id).delete
+    }
   }
+
+
 }
