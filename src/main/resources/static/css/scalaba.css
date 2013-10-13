@@ -1,0 +1,25 @@
+.thread {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.post {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.post-body {
+    margin: 5px;
+}
+
+.post-heading {
+    margin-top: 5px;
+}
+
+.panel-create-thread {
+	margin-top: 5px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 5px;
+	text-align: center;
+}

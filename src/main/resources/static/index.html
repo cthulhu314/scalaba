@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html ng-app="scalaba">
+<head>
+    <title>Scalaba</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/scalaba.css" rel="stylesheet">
+</head>
+<body>
+<div ng-controller="NavigationController">
+    <nav class="navbar navbar-default" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#/threads">Scalaba</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#/threads">Треды</a></li>
+                <li><a ng-click="triggerThreadCreationForm()">Создать {{ type }}</a></li>
+            </ul>
+    <!--         <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Поиск по тредам">
+                </div>
+                <button type="submit" class="btn btn-default">Искать</button>
+            </form> -->
+        </div><!-- /.navbar-collapse -->
+    </nav>
+    <div ng-show="threadFormOpened" class="panel panel-default panel-create-thread"> 
+        <div class="panel-body">
+            <form>
+                <input class="form-control" type="text" ng-model="model.theme" placeholder="Тема"/>
+                <input class="form-control" type="text" ng-model="model.author" placeholder="Автор" />
+                <textarea class="form-control" ng-model="model.text" placeholder="Введите текст поста" ></textarea>
+                <button class="btn btn-default" ng-click="createThread()">Создать {{ type }}</button>
+            </form>            
+        </div>
+    </div>
+    <div class="alert alert-danger alert-dismissable" ng-repeat="alert in alerts">
+        <button type="button" class="close" ng-click="$parent.remove($parent.alerts,alert)" data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{alert}}   
+    </div>
+    <div class="alert alert-warning alert-dismissable" ng-repeat="warning in warnings">
+        <button type="button" class="close" ng-click="$parent.remove($parent.warnings,warning)"  data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{warning}}   
+    </div>
+    <div class="alert alert-danger alert-dismissable" ng-repeat="success in successes">
+        <button type="button" class="close" ng-click="$parent.remove($parent.successes,success)"  data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{success}}   
+    </div>
+</div>
+
+<div ng-view></div>
+
+
+
+<script src="http://code.jquery.com/jquery.js"></script>
+
+<script src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="js/scalaba.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+
+<script type="text/javascript" src="js/ng-infinite-scroll.min.js"></script>
+
+<script type="text/javascript" src="js/moment.min.js"></script>
+
+
+
+</body>
+</html>

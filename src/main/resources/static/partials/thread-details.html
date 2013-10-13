@@ -1,0 +1,23 @@
+<div class="thread panel panel-default">
+    <div class="panel-heading">{{ model.op.theme }}</div>
+    <ul class="media-list">
+        <li class="media post op-post panel panel-default">
+            <a class="pull-left" href="#">
+                <!--<img class="media-object" src="..." alt="...">-->
+            </a>
+            <div class="media-body">
+                <h5 class="media-heading post-heading">{{ model.op.theme }}</h5>
+                <div class="post-body">{{ model.op.text }}</div>
+            </div>
+        </li>
+        <li class="media post panel panel-default" ng-repeat="post in model.posts">
+            <a class="pull-left" href="#">
+                <!--<img class="media-object" src="..." alt="...">-->
+            </a>
+            <div class="media-body post-heading">
+                <h6 class="media-heading">{{ post.theme }}</h6>
+                <div class="post-body">{{ post.text }}</div>
+            </div>
+        </li>
+    </ul>
+</div>

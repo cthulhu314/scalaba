@@ -1,0 +1,27 @@
+<div class="threads" infinite-scroll="loadThreads()" infinite-scroll-distance="1" infinity-scroll-disabled="busy">
+    <div class="thread panel panel-default" ng-repeat="thread in model.threads"  >
+    <!-- infinite-scroll="loadThreads()" infinite-scroll-distance="1" -->
+        <div class="panel-heading"><a href="#/thread/{{thread.id}}">{{ thread.op.theme }}</a></div>
+        <ul class="media-list">
+            <li class="media post op-post panel panel-default">
+                <a class="pull-left" href="#">
+                    <!--<img class="media-object" src="..." alt="...">-->
+                </a>
+                <div class="media-body">
+                    <h5 class="media-heading post-heading">{{ thread.op.theme }}</h5>
+                    <div class="post-body">{{ thread.op.text }}</div>
+                </div>
+            </li>
+            <li class="media post panel panel-default" ng-repeat="post in thread.posts">
+                <a class="pull-left" href="#">
+                    <!--<img class="media-object" src="..." alt="...">-->
+                </a>
+                <div class="media-body post-heading">
+                    <h6 class="media-heading">{{ post.theme }}</h6>
+                    <div class="post-body">{{ post.text }}</div>
+                </div>
+            </li>
+        </ul>
+    </div><!-- 
+    <div ng-show='busy'>Идёт загрузка...</div> -->
+</div>
