@@ -5,14 +5,17 @@ import akka.io.IO
 import spray.can.Http
 import com.github.cthulhu314.scalaba.actors.RepositoryActor
 import com.github.cthulhu314.scalaba.persistance.{MongoRepository, SlickRepository}
+import akka.routing.RoundRobinRouter
 
 object Boot extends App {
 
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("scalaba")
   implicit val executionContext = system.dispatcher
+  val repository = new MongoRepository("")
+  val dbActor = system.actorOf(Props(new RepositoryActor(repository))
+    .withRouter(RoundRobinRouter(5)))
 
-  val dbActor = system.actorOf(Props(new RepositoryActor(new MongoRepository(""))))
   // create and start our service actor
   val service = system.actorOf(Props(new ScalabaActor(dbActor)), "scalaba-service")
 

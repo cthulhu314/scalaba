@@ -12,9 +12,8 @@ import spray.routing.directives.CacheSpecMagnet
 import spray.httpx.Json4sJacksonSupport
 import spray.httpx.marshalling._
 import com.github.cthulhu314.scalaba.models.{Thread,Post}
-import com.github.cthulhu314.scalaba.actors.RepositoryActor
-import org.json4s.{FieldSerializer, DefaultFormats, Formats}
 import com.github.cthulhu314.scalaba.actors._
+import org.json4s.{FieldSerializer, DefaultFormats, Formats}
 import org.json4s
 import scala.concurrent.ExecutionContext
 import org.omg.CosNaming.NamingContextPackage.NotFound
@@ -81,11 +80,11 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
     } ~
     get {
      // cache(simpleCache) {
-        path("") {
-          getFromFile("index.html")
-        } ~
         getFromResourceDirectory("static")
      // }
+    } ~
+    get {
+      getFromFile("index.html")
     }
 
 
