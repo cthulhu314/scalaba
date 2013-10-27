@@ -9,14 +9,14 @@ class PerformanceLoggingRepositoryDecorator(decorated : Repository) extends Repo
     val now = System.nanoTime
     val result = action(k)
     val micros = (System.nanoTime - now) / 1000
-    logger.info("Method " + name + " in " + decorated.getClass.getName + " took " + micros + " ms")
+    logger.info("Method " + name + " in " + decorated.getClass.getName + " took " + micros + " microseconds")
     result
   }
   private def timeOf2[K,T,L](name : String)(action : (K, T) => L)(k : K, t : T) : L = {
     val now = System.nanoTime
     val result = action(k,t)
     val micros = (System.nanoTime - now) / 1000
-    logger.info("Method " + name + " in " + decorated.getClass.getName + " took " + micros + " ms")
+    logger.info("Method " + name + " in " + decorated.getClass.getName + " took " + micros + " microseconds")
     result
   }
 
