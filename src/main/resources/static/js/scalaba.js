@@ -62,6 +62,26 @@ Scalaba.Controllers.NavigationController = function($scope,$location,$routeParam
 
 };
 
+Scalaba.Persistance.RemoteRepository = function($http) {
+    var collection = []
+    this.get = function(id) {
+        if(id == undefined) {
+            return $http.get("/api/threads");
+        } else if (id.from!=undefined && id.count!=undefined) {
+            return $http.get("/api/threads",id)
+        } else {
+            return $http.get("/api/thread/"+id.toString())
+        }
+    };
+    this.add = function(post,threadId) {
+        if(threadId == undefined) {
+            return $http.post("/api/thread",post);
+        } else {
+            return $http.post("/api/post",post);
+        }
+    }
+}
+
 Scalaba.Persistance.LocalRepository = function($q) {
     var collection = [{id: 0, op : {theme:"lol",author:"nyan",text:"oaisdhiHASDGAISDBQWKBDQJLHWE"},
                 posts: [{theme:"lol1",author:"KJASJHDSA",text:"alkhdKLJSAKJHASDBJASD"}]}];
@@ -71,8 +91,8 @@ Scalaba.Persistance.LocalRepository = function($q) {
         if(id == undefined) {
             promise.resolve(collection);
             
-        } else if (id.from && id.count) {
-            promise.resolve(collection.splice(from,count));
+        } else if (id.from!=undefined && id.count!=undefined) {
+            promise.resolve(collection.splice(id.from,id.count));
         } else {
             if(collection[id] == undefined) {
                 promise.reject("Not found")   
@@ -83,13 +103,13 @@ Scalaba.Persistance.LocalRepository = function($q) {
         }
         return promise.promise;
     };
-    this.add = function(post,threadId) {
+    this.add = function(post) {
         var promise = $q.defer();
         if(threadId == undefined) {
             collection.push({id: collection.length, op: post, posts: [] })
             promise.resolve("Добавлен")
         } else {
-            var thread = collection[threadId];
+            var thread = collection[post.threadId];
             if(thread == undefined) {
                 promise.reject("Тред не найден");  
             } else {
@@ -107,6 +127,9 @@ $(document).ready(function() {
     var app = angular.module('scalaba',['infinite-scroll']);
     app.config(['$routeProvider',function($routeProvider) {
         $routeProvider
+            .when('',{
+                redirectTo: '/threads'
+            })
             .when('/threads',{
                 templateUrl: "partials/thread-list.html",
                 controller: "ThreadListController"
@@ -122,8 +145,8 @@ $(document).ready(function() {
                 redirectTo: '/not/found' 
             });
     }]);
-    app.factory('repository',function($q) {
-        return new Scalaba.Persistance.LocalRepository($q);
+    app.factory('repository',function($http) {
+        return new Scalaba.Persistance.RemoteRepository($http);
     });
     app.controller('ThreadController',['$scope','$location','$routeParams','repository',Scalaba.Controllers.ThreadController]);
     app.controller('ThreadListController',['$scope','$location','repository',Scalaba.Controllers.ThreadListController])

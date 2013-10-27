@@ -10,6 +10,8 @@ resolvers ++= Seq(
   "spray repo" at "http://repo.spray.io/"
 )
 
+resolvers += "repo.novus rels" at "http://repo.novus.com/releases/"
+
 libraryDependencies ++= Seq(
   "io.spray"            %   "spray-can"     % "1.2-M8",
   "io.spray"            %   "spray-routing" % "1.2-M8",
@@ -29,6 +31,10 @@ libraryDependencies ++= List(
 libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.2.5"
 
 libraryDependencies += "com.escalatesoft.subcut" %% "subcut" % "2.0"
+
+libraryDependencies += "org.mongodb" %% "casbah" % "2.6.3"
+
+libraryDependencies += "com.novus" %% "salat" % "1.9.4"
 
 seq(Revolver.settings: _*)
 

@@ -17,6 +17,8 @@ class RepositoryActor(repository : Repository) extends Actor  {
     case GetPost(id) => sender ! repository.getPost(id)
     case GetThread(id) => sender ! repository.getThread(id)
     case GetThreads(from,count) => sender ! repository.getThreads(from,count)
+    case CreateThread(thread) => sender ! repository.create(thread)
+    case CreatePost(post) => sender ! repository.create(post)
   }
 }
 

@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import spray.can.Http
 import com.github.cthulhu314.scalaba.actors.RepositoryActor
-import com.github.cthulhu314.scalaba.persistance.SlickRepository
+import com.github.cthulhu314.scalaba.persistance.{MongoRepository, SlickRepository}
 
 object Boot extends App {
 
@@ -12,7 +12,7 @@ object Boot extends App {
   implicit val system = ActorSystem("scalaba")
   implicit val executionContext = system.dispatcher
 
-  val dbActor = system.actorOf(Props(new RepositoryActor(new SlickRepository())))
+  val dbActor = system.actorOf(Props(new RepositoryActor(new MongoRepository(""))))
   // create and start our service actor
   val service = system.actorOf(Props(new ScalabaActor(dbActor)), "scalaba-service")
 

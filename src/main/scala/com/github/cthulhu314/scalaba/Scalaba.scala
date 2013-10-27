@@ -17,6 +17,7 @@ import org.json4s.{FieldSerializer, DefaultFormats, Formats}
 import com.github.cthulhu314.scalaba.actors._
 import org.json4s
 import scala.concurrent.ExecutionContext
+import org.omg.CosNaming.NamingContextPackage.NotFound
 
 
 class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
@@ -41,8 +42,8 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
       } ~
       pathPrefix("thread" / IntNumber) { id =>
         get {
-          produce(instanceOf[Thread]) { cpl => _ =>
-            (dbActor ? GetThread(id)).mapTo[Thread].foreach(cpl)
+          produce(instanceOf[Option[Thread]]) { cpl => _ =>
+            (dbActor ? GetThread(id)).mapTo[Option[Thread]].foreach(cpl)
           }
         }
       } ~
@@ -50,16 +51,18 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
         post {
           entity(as[Thread]) { thread =>
             complete {
-              dbActor ! CreateThread(thread)
-              "ok"
+              (dbActor ? CreateThread(thread)).map {
+                case Some(_) => StatusCodes.OK
+                case None => StatusCodes.NotFound
+              }
             }
           }
         }
       } ~
       pathPrefix("post" / IntNumber) { id =>
         get {
-          produce(instanceOf[Post]) { cpl => _ =>
-            (dbActor ? GetPost(id)).mapTo[Post].foreach(cpl)
+          produce(instanceOf[Option[Post]]) { cpl => _ =>
+            (dbActor ? GetPost(id)).mapTo[Option[Post]].foreach(cpl)
           }
         }
       } ~
@@ -67,17 +70,22 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
         post  {
           entity(as[Post]) { post =>
             complete {
-              dbActor ! CreatePost(post)
-              "ok"
+              (dbActor ? CreatePost(post)).map {
+                case Some(_) => StatusCodes.OK
+                case None => StatusCodes.NotFound
+              }
             }
           }
         }
       }
     } ~
     get {
-      cache(simpleCache) {
+     // cache(simpleCache) {
+        path("") {
+          getFromFile("index.html")
+        } ~
         getFromResourceDirectory("static")
-      }
+     // }
     }
 
 

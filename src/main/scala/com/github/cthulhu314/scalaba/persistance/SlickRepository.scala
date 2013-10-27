@@ -3,7 +3,7 @@ package com.github.cthulhu314.scalaba.persistance
 import com.github.cthulhu314.scalaba.models.{Thread, Post}
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.ColumnBase
-import java.sql.Date
+import java.sql.{Timestamp, Date}
 import java.lang
 import scala.slick.jdbc.meta.MTable
 
@@ -17,10 +17,10 @@ class SlickRepository extends Repository {
     def author = column[String]("author")
     def image = column[String]("image")
     def text = column[String]("text")
-    def date = column[Date]("date")
+    def date = column[Timestamp]("date")
 
-    def * : ColumnBase[Post] = (id.? ~ threadId.? ~ title ~ author ~ image ~ text ~ date) <> (Post.apply _,Post.unapply _)
-    def forInsert = (threadId.? ~ title ~ author ~ image ~ text ~ date) <> ({t => Post(None,t._1,t._2,t._3,t._4,t._5,t._6)},
+    def * : ColumnBase[Post] = (id.? ~ threadId.? ~ title.? ~ author.? ~ image.? ~ text ~ date.?) <> (Post.apply _,Post.unapply _)
+    def forInsert = (threadId.? ~ title.? ~ author.? ~ image.? ~ text ~ date.?) <> ({t => Post(None,t._1,t._2,t._3,t._4,t._5,t._6)},
       {(p : Post) => Some((p.threadId,p.title,p.author,p.image,p.text,p.date)) })
   }
   val db = Database.forURL( "jdbc:sqlserver://localhost;databaseName=cust;instanceName=SQLEXPRESS;", driver = "org.h2.Driver")
