@@ -27,7 +27,6 @@ class SlickRepository extends Repository {
   db.withSession { implicit session : Session =>
     if(!MTable.getTables.list.exists(_.name.name == Posts.tableName))  {
       Posts.ddl.create(session)
-      println("Posts created")
     }
 
   }
