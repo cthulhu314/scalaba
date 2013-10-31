@@ -4,24 +4,34 @@ import com.github.cthulhu314.scalaba.persistance.{SlickRepository, Repository}
 import akka.actor._
 import com.github.cthulhu314.scalaba.models.{Post,Thread}
 
-case class GetPost(id : Int)
-case class GetThread(id : Int)
-case class CreateThread(thread : Thread)
-case class CreatePost(post : Post)
-case class GetThreads(from : Int, count : Int)
-case class DeleteThread(id : Int)
-case class DeletePost(id : Int)
+trait RepositoryMessage
 
-class RepositoryActor(repository : Repository) extends Actor  {
+object RepositoryMessage {
+  def applyTo(repository : Repository)(message : RepositoryMessage) = message match {
+    case GetPost(id) => repository.getPost(id)
+    case GetThread(id) =>  repository.getThread(id)
+    case GetThreads(from,count) => repository.getThreads(from,count)
+    case CreateThread(thread) => repository.create(thread)
+    case CreatePost(post) => repository.create(post)
+    case DeleteThread(id) => repository.delete(Thread(id = id,posts = Seq()))
+    case DeletePost(id) => repository.delete(Post(Some(id),None,None,None,None,"",null))
 
-  def receive = {
-    case GetPost(id) => sender ! repository.getPost(id)
-    case GetThread(id) => sender ! repository.getThread(id)
-    case GetThreads(from,count) => sender ! repository.getThreads(from,count)
-    case CreateThread(thread) => sender ! repository.create(thread)
-    case CreatePost(post) => sender ! repository.create(post)
-    case DeleteThread(id) => sender ! repository.delete(Thread(id = id,posts = Seq()))
-    case DeletePost(id) => sender ! repository.delete(Post(Some(id),None,None,None,None,"",null))
   }
 }
+
+case class GetPost(id : Int) extends RepositoryMessage
+case class GetThread(id : Int) extends RepositoryMessage
+case class CreateThread(thread : Thread) extends RepositoryMessage
+case class CreatePost(post : Post) extends RepositoryMessage
+case class GetThreads(from : Int, count : Int) extends RepositoryMessage
+case class DeleteThread(id : Int) extends RepositoryMessage
+case class DeletePost(id : Int) extends RepositoryMessage
+
+class RepositoryActor(repository : Repository) extends Actor  {
+  import RepositoryMessage._
+  def receive = {
+    case x : RepositoryMessage => sender ! applyTo(repository)(x)
+  }
+}
+
 

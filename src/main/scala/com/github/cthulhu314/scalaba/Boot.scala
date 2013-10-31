@@ -13,7 +13,7 @@ object Boot extends App {
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("scalaba")
   implicit val executionContext = system.dispatcher
-  val repository = new PerformanceLoggingRepositoryDecorator(new MongoRepository(""))
+  val repository = new PerformanceLoggingRepositoryDecorator(new MongoRepository("","scalaba"))
   val dbActor = system.actorOf(Props(new RepositoryActor(repository))
     .withRouter(RoundRobinRouter(5)))
   val fileActor = system.actorOf(Props(new FileRepositoryActor(new NopFileRepository())))

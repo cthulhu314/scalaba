@@ -6,10 +6,10 @@ import com.novus.salat._
 import com.novus.salat.global._
 import scala.Some
 
-class MongoRepository(url : String) extends Repository{
+class MongoRepository(url : String, database : String) extends Repository{
   val db = MongoClient(url)
-  val posts = db("scalaba")("posts")
-  val idColl = db("scalaba")("id_coll")
+  val posts = db(database)("posts")
+  val idColl = db(database)("id_coll")
 
   if(idColl.count() == 0) {
     idColl.insert(MongoDBObject("id" -> 0))

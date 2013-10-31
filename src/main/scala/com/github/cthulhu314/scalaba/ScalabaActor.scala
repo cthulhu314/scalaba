@@ -71,7 +71,6 @@ class ScalabaActor(dbActor : ActorRef, filesActor : ActorRef)
         }
       } ~
       path("post") {
-
         post  {
           entity(as[Post]) { post =>
             complete {

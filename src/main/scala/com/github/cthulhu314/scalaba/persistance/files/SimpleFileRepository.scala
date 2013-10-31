@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class SimpleFileRepository(path : String) extends FileRepository {
 	private val id = new AtomicInteger(0)
 	def create(file : Array[Byte]) : Option[String] = {
-		val fos = new FileOutputStream(path + "/" + id);
+		val fos = new FileOutputStream(path + "/" + id)
 		var result : Option[String] = None
 		try {
 			fos.write(file)
