@@ -9,9 +9,10 @@ case class GetThread(id : Int)
 case class CreateThread(thread : Thread)
 case class CreatePost(post : Post)
 case class GetThreads(from : Int, count : Int)
+case class DeleteThread(id : Int)
+case class DeletePost(id : Int)
 
 class RepositoryActor(repository : Repository) extends Actor  {
-
 
   def receive = {
     case GetPost(id) => sender ! repository.getPost(id)
@@ -19,6 +20,8 @@ class RepositoryActor(repository : Repository) extends Actor  {
     case GetThreads(from,count) => sender ! repository.getThreads(from,count)
     case CreateThread(thread) => sender ! repository.create(thread)
     case CreatePost(post) => sender ! repository.create(post)
+    case DeleteThread(id) => sender ! repository.delete(Thread(id = id,posts = Seq()))
+    case DeletePost(id) => sender ! repository.delete(Post(Some(id),None,None,None,None,"",null))
   }
 }
 

@@ -3,11 +3,14 @@ package com.github.cthulhu314.scalaba
 import akka.actor._
 import akka.pattern._
 import spray.routing._
+import spray.routing.authentication._
+import spray.routing.directives.SecurityDirectives
 import spray.http._
 import spray.routing.directives.CachingDirectives._
+import com.github.cthulhu314.scalaba.auth._
 import MediaTypes._
 import spray.httpx.encoding._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{DurationDouble, Duration}
 import spray.routing.directives.CacheSpecMagnet
 import spray.httpx.Json4sJacksonSupport
 import spray.httpx.marshalling._
@@ -19,7 +22,8 @@ import scala.concurrent.ExecutionContext
 import org.omg.CosNaming.NamingContextPackage.NotFound
 
 
-class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
+class ScalabaActor(dbActor : ActorRef, filesActor : ActorRef)
+                  (implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
 
   def actorRefFactory = context
 
@@ -57,6 +61,7 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
             }
           }
         }
+
       } ~
       pathPrefix("post" / IntNumber) { id =>
         get {
@@ -66,6 +71,7 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
         }
       } ~
       path("post") {
+
         post  {
           entity(as[Post]) { post =>
             complete {
@@ -76,6 +82,20 @@ class ScalabaActor(dbActor : ActorRef)(implicit val executionContext : Execution
             }
           }
         }
+      }
+    } ~
+    path("files") {
+      post {
+        detachTo(singleRequestServiceActor) {
+          formField('file.as[Array[Byte]]) { file =>
+            produce(instanceOf[Option[String]]) { cpl => _ =>          
+              (filesActor ? CreateFile(file)).mapTo[Option[String]].foreach(cpl)
+            }
+          }
+        }
+      } ~
+      get {
+        getFromResourceDirectory("files")
       }
     } ~
     get {
