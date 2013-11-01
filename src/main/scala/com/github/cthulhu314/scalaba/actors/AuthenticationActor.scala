@@ -1,6 +1,6 @@
 package com.github.cthulhu314.scalaba.actors
 
-import com.github.cthulhu314.scalaba.auth.Authentication
+import com.github.cthulhu314.scalaba.authentication.Authentication
 import akka.actor._
 
 case class Authenticate[T](context : T)
