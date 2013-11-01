@@ -7,6 +7,7 @@ import com.github.cthulhu314.scalaba.actors.{FileRepositoryActor, RepositoryActo
 import com.github.cthulhu314.scalaba.persistance.{PerformanceLoggingRepositoryDecorator, MongoRepository, SlickRepository}
 import akka.routing.RoundRobinRouter
 import com.github.cthulhu314.scalaba.persistance.files.NopFileRepository
+import com.github.cthulhu314.scalaba.generators.{Static, Files, Api}
 
 object Boot extends App {
 
@@ -18,7 +19,12 @@ object Boot extends App {
     .withRouter(RoundRobinRouter(5)))
   val fileActor = system.actorOf(Props(new FileRepositoryActor(new NopFileRepository())))
   // create and start our service actor
-  val service = system.actorOf(Props(new ScalabaActor(dbActor,fileActor)), "scalaba-service")
+  val service = system.actorOf(Props(new ScalabaGeneratorsActor(
+    Seq(
+      Api(dbActor),
+      Files(fileActor),
+      Static(system)
+    ))), "scalaba-service")
 
   // start a new HTTP server on port 8080 with our service actor as the handler
   IO(Http) ! Http.Bind(service, interface = "localhost", port = 8080)
