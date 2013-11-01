@@ -20,7 +20,7 @@ import org.json4s.{FieldSerializer, DefaultFormats, Formats}
 import org.json4s
 import scala.concurrent.ExecutionContext
 import org.omg.CosNaming.NamingContextPackage.NotFound
-
+import spray.httpx.unmarshalling.{Deserializer, BasicUnmarshallers}
 
 class ScalabaActor(dbActor : ActorRef, filesActor : ActorRef)
                   (implicit val executionContext : ExecutionContext) extends Actor with Json4sJacksonSupport with HttpService  {
@@ -86,6 +86,7 @@ class ScalabaActor(dbActor : ActorRef, filesActor : ActorRef)
     path("files") {
       post {
         detachTo(singleRequestServiceActor) {
+          import Deserializer._
           formField('file.as[Array[Byte]]) { file =>
             produce(instanceOf[Option[String]]) { cpl => _ =>          
               (filesActor ? CreateFile(file)).mapTo[Option[String]].foreach(cpl)
