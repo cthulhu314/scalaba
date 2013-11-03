@@ -14,17 +14,15 @@ object Files extends Directives {
            (implicit context : ExecutionContext, actorRefFactory : ActorRefFactory) = {
     path("files") {
       post {
-        detachTo(singleRequestServiceActor) {
           formField('file.as[Array[Byte]]) { file =>
             produce(instanceOf[Option[String]]) { cpl => _ =>
               (filesActor ? CreateFile(file)).mapTo[Option[String]].foreach(cpl)
             }
           }
-        }
       } ~
-        get {
-          getFromResourceDirectory("files")
-        }
+      get {
+        getFromResourceDirectory("files")
+      }
     }
   }
   implicit val timeout : akka.util.Timeout = 5.seconds

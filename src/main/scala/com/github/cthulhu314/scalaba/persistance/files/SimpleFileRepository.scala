@@ -10,21 +10,21 @@ class SimpleFileRepository(path : String) extends FileRepository {
 		var result : Option[String] = None
 		try {
 			fos.write(file)
-			result = Some(id.getAndIncrement().toString())
+			result = Some(id.getAndIncrement.toString)
 		}
 		finally {
 			fos.close()
 		}
 		result
 	}
-  	def delete(name : String) : Boolean = {
-  		var result = false
-  		try {
-  			val file = new File(name)
-  			result = file.delete()
-  		} catch {
-  			case _ : Throwable => { }
-  		}
-  		result
-  	}
+  def delete(name : String) : Boolean = {
+    var result = false
+    try {
+      val file = new File(name)
+      result = file.delete()
+    } catch {
+      case _ : Throwable => { }
+    }
+    result
+  }
 }

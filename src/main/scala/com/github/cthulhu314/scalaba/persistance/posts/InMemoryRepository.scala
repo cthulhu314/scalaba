@@ -4,12 +4,13 @@ import com.github.cthulhu314.scalaba.models.{Thread, Post}
 import scala.collection.parallel.mutable._
 import scala.collection._
 import java.util.concurrent.atomic.AtomicInteger
+import java.sql.Timestamp
 
 
 class InMemoryRepository extends Repository{
-  private val threadMap = new ParHashMap[Int,Thread]()
-  private val postMap = new ParHashMap[Int,Post]()
-  private val id = new AtomicInteger(0)
+  protected val threadMap = new ParHashMap[Int,Thread]()
+  protected val postMap = new ParHashMap[Int,Post]()
+  protected val id = new AtomicInteger(0)
 
   private def withId[T](action : Int => T) = action(id.getAndIncrement)
 
@@ -22,9 +23,13 @@ class InMemoryRepository extends Repository{
 
   def create(thread: Thread): Option[Thread] = {
     withId { id =>
-      val newThread = thread.copy(id = id,posts = thread.posts.map{p => p.copy(id=Some(id),threadId = Some(id))})
+      //TODO: possible bug with id!
+      val date = new Timestamp(System.currentTimeMillis())
+      val newThread = thread.copy(
+        id = id,
+        posts = thread.posts.map{p => p.copy(id=Some(id),threadId = Some(id), date = Some(date))}.take(1))
       threadMap.put(id,newThread)
-      postMap.put(id,thread.posts.head)
+      postMap.put(id,newThread.posts.head)
       Some(newThread)
     }
   }
@@ -32,7 +37,8 @@ class InMemoryRepository extends Repository{
   def create(post: Post): Option[Post] = {
     post.threadId.flatMap(threadMap.get).map { thread =>
       withId { id =>
-        val newPost = post.copy(id = Some(id))
+        val date = new Timestamp(System.currentTimeMillis())
+        val newPost = post.copy(id = Some(id), date=Some(date))
         threadMap.update(post.threadId.get,thread.copy(posts = thread.posts ++ Seq(newPost)))
         postMap.put(id,newPost)
         newPost
