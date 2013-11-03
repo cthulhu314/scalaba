@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import spray.can.Http
 import com.github.cthulhu314.scalaba.actors.{FileRepositoryActor, RepositoryActor}
-import com.github.cthulhu314.scalaba.persistance.{InMemoryRepository, PerformanceLoggingRepositoryDecorator, MongoRepository, SlickRepository}
+import com.github.cthulhu314.scalaba.persistance.posts.{InMemoryRepository, PerformanceLoggingRepositoryDecorator, MongoRepository, SlickRepository}
 import akka.routing.RoundRobinRouter
 import com.github.cthulhu314.scalaba.persistance.files.NopFileRepository
 import com.github.cthulhu314.scalaba.generators.{Static, Files, Api}

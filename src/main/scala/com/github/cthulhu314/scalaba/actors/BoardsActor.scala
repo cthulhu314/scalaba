@@ -3,7 +3,7 @@ package com.github.cthulhu314.scalaba.actors
 import akka.actor._
 import com.github.cthulhu314.scalaba.persistance.boards.Boards
 
-case class BoardAction(board : String, action : RepositoryMessage)
+case class BoardAction(board : String, action : RepositoryMessage) extends Intention
 
 class BoardsActor(board : Boards) extends Actor {
   import RepositoryMessage._

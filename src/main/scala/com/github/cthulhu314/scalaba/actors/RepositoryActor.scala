@@ -1,10 +1,10 @@
 package com.github.cthulhu314.scalaba.actors
 
-import com.github.cthulhu314.scalaba.persistance.{SlickRepository, Repository}
+import com.github.cthulhu314.scalaba.persistance.posts.{SlickRepository, Repository}
 import akka.actor._
 import com.github.cthulhu314.scalaba.models.{Post,Thread}
 
-trait RepositoryMessage
+trait RepositoryMessage extends Intention
 
 object RepositoryMessage {
   def applyTo(repository : Repository)(message : RepositoryMessage) = message match {

@@ -1,6 +1,6 @@
 package com.github.cthulhu314.scalaba.persistance.boards
 
-import com.github.cthulhu314.scalaba.persistance.Repository
+import com.github.cthulhu314.scalaba.persistance.posts.Repository
 
 class SingleBoard(repository : Repository) extends Boards {
   def get(key: String): Option[Repository] = Some(repository)

@@ -1,6 +1,5 @@
 package com.github.cthulhu314.scalaba.persistance.posts
 
-import com.github.cthulhu314.scalaba.persistance.InMemoryRepository
 import com.github.cthulhu314.scalaba.models.{Thread,Post}
 import java.sql.Timestamp
 

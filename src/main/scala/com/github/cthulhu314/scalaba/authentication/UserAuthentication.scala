@@ -14,16 +14,25 @@ class UserAuthentication(val realm : String)(implicit val executionContext: Exec
 
   def params(ctx: RequestContext): Map[String, String] = Map.empty
 
+  var defaultName = "anon"
+  var defaultPass = ""
+
   def authenticate(credentials: Option[HttpCredentials], ctx: RequestContext) = {
       Future {
-        credentials.flatMap {
-          case BasicHttpCredentials(user, pass) ⇒
+        credentials match {
+          case Some(BasicHttpCredentials(user, pass)) ⇒
             ctx.request.header[`X-Forwarded-For`].flatMap { forwarded =>
               ctx.request.header[`User-Agent`].flatMap { agent =>
                 Some(User(user,pass,agent.value,forwarded.value))
               }
             }
-          case _ ⇒ None
+          case _ ⇒ {
+            ctx.request.header[`X-Forwarded-For`].flatMap { forwarded =>
+              ctx.request.header[`User-Agent`].flatMap { agent =>
+                Some(User(defaultName,defaultPass,agent.value,forwarded.value))
+              }
+            }
+          }
         }
       }
   }
